@@ -72,6 +72,7 @@ class SeleniumPharosParser:
             driver_alert.accept()
             return(message)
         except:
+            # In most cases driver_alert.text will produce nothing and we simply proceed
             pass
 
         # Removing popups
@@ -79,11 +80,13 @@ class SeleniumPharosParser:
             driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
             sleep(2)
         except :
+            # Pop-up did-not appear, do nothing
             pass
 
         try:
             driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
         except :
+            # Pop-up did-not appear, do nothing
             pass
 
         # Click Download
@@ -113,11 +116,13 @@ class SeleniumPharosParser:
                 driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
                 sleep(2)
             except :
+                # Pop-up did-not appear, do nothing
                 pass
 
             try:
                 driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
             except :
+                # Pop-up did-not appear, do nothing
                 pass
 
             # Click Download
@@ -198,6 +203,7 @@ class SeleniumPharosParser:
                 self.parse_one_target_ligand(x)
                 sleep(0.5)
             except:
+                # Not safe at the moment (improve later)
                 self.parse_one_target_ligand(x)
                 sleep(0.5)
 
