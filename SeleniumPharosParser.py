@@ -36,10 +36,11 @@ class SeleniumPharosParser:
 
 
 
-    def __init__(self, PATH_logs, PATH_downloads, binary_path):
+    def __init__(self, PATH_logs, PATH_downloads, binary_path, gecko_path):
         self.driver_logs = PATH_logs
         self.downloads_folder = PATH_downloads
         self.binary_path = binary_path
+        self.gecko_path = gecko_path
 
     def initialize_session(self):
         ops = Options()
@@ -51,6 +52,7 @@ class SeleniumPharosParser:
         profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/x-gzip")
         driver = webdriver.Firefox(
                     service_log_path=self.driver_logs,
+                    executable_path=self.gecko_path,
                     firefox_profile=profile,
                     options=ops)
         driver.implicitly_wait(1)
@@ -72,7 +74,6 @@ class SeleniumPharosParser:
             driver_alert.accept()
             return(message)
         except:
-            # In most cases driver_alert.text will produce nothing and we simply proceed
             pass
 
         # Removing popups
@@ -80,13 +81,11 @@ class SeleniumPharosParser:
             driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
             sleep(2)
         except :
-            # Pop-up did-not appear, do nothing
             pass
 
         try:
             driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
         except :
-            # Pop-up did-not appear, do nothing
             pass
 
         # Click Download
@@ -116,13 +115,11 @@ class SeleniumPharosParser:
                 driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
                 sleep(2)
             except :
-                # Pop-up did-not appear, do nothing
                 pass
 
             try:
                 driver.find_element(By.CLASS_NAME, "shepherd-cancel-icon").click()
             except :
-                # Pop-up did-not appear, do nothing
                 pass
 
             # Click Download
@@ -167,7 +164,10 @@ class SeleniumPharosParser:
         os.chdir(self.downloads_folder)
         os.rename("pharos data download.zip", "pharos_data_download.zip")
 
-        zip_file = self.downloads_folder + "\\" + "pharos_data_download.zip"
+        if os.name == "nt":
+            zip_file = self.downloads_folder + "\\" + "pharos_data_download.zip"
+        else:
+            zip_file = self.downloads_folder + "/" + "pharos_data_download.zip"
 
         with zipfile.ZipFile(zip_file,"r") as zip_ref:
             zip_ref.extractall(self.downloads_folder)
@@ -182,7 +182,10 @@ class SeleniumPharosParser:
         uniprotID = uniprotID.iloc[0]
 
         # Saving under new file name
-        new_filename = self.downloads_folder + "\\" + uniprotID + ".csv"
+        if os.name == "nt":
+            new_filename = self.downloads_folder + "\\" + uniprotID + ".csv"
+        else:
+            new_filename = self.downloads_folder + "/" + uniprotID + ".csv"
         dataset.to_csv(new_filename)
         os.remove("query results.csv")
 
@@ -203,7 +206,6 @@ class SeleniumPharosParser:
                 self.parse_one_target_ligand(x)
                 sleep(0.5)
             except:
-                # Not safe at the moment (improve later)
                 self.parse_one_target_ligand(x)
                 sleep(0.5)
 
